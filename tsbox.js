@@ -1,6 +1,9 @@
 class tsbox{	
+	
+	///////////
+	// Maths //
+	///////////
 
-	// Maths
 	static distanceBetween(p1x, p1y, p2x, p2y){
 		return Math.hypot(p1x - p2x, p1y - p2y);
 	}
@@ -32,12 +35,73 @@ class tsbox{
 	}
 
 	static pointInPolygon(poly, pt){
-		for(let c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y)) && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) && (c = !c); 
+		for(let c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y)) && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) && (c = !c);
 
 		return c;
 	}
 
-	// Converts
+	// K3N cardinal curve - http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+	static smoothPath(ptsa, tension, isClosed, numOfSegments){
+		tension = (typeof tension != 'undefined') ? tension : 0.5;
+	    isClosed = isClosed ? isClosed : false;
+	    numOfSegments = numOfSegments ? numOfSegments : 16;
+
+	    var _pts = [], res = [], x, y, t1x, t2x, t1y, t2y, c1, c2, c3, c4, st, t, i;
+
+	    _pts = ptsa.slice(0);
+
+	    if (isClosed) {
+	        _pts.unshift(_pts[_pts.length - 1]);
+	        _pts.unshift(_pts[_pts.length - 2]);
+	        _pts.unshift(_pts[_pts.length - 1]);
+	        _pts.unshift(_pts[_pts.length - 2]);
+	        _pts.push(_pts[0]);
+	        _pts.push(_pts[1]);
+	    }
+	    else {
+	        _pts.unshift(_pts[1]);
+	        _pts.unshift(_pts[0]);
+	        _pts.push(_pts[_pts.length - 2]);
+	        _pts.push(_pts[_pts.length - 1]);
+	    }
+
+	    for (i=2; i < (_pts.length - 4); i+=2) {
+	        for (t=0; t <= numOfSegments; t++) {
+
+	            // calc tension vectors
+	            t1x = (_pts[i+2] - _pts[i-2]) * tension;
+	            t2x = (_pts[i+4] - _pts[i]) * tension;
+
+	            t1y = (_pts[i+3] - _pts[i-1]) * tension;
+	            t2y = (_pts[i+5] - _pts[i+1]) * tension;
+
+	            // calc step
+	            st = t / numOfSegments;
+
+	            // calc cardinals
+	            c1 =   2 * Math.pow(st, 3)  - 3 * Math.pow(st, 2) + 1; 
+	            c2 = -(2 * Math.pow(st, 3)) + 3 * Math.pow(st, 2); 
+	            c3 =       Math.pow(st, 3)  - 2 * Math.pow(st, 2) + st; 
+	            c4 =       Math.pow(st, 3)  -     Math.pow(st, 2);
+
+	            // calc x and y cords with common control vectors
+	            x = c1 * _pts[i]    + c2 * _pts[i+2] + c3 * t1x + c4 * t2x;
+	            y = c1 * _pts[i+1]  + c2 * _pts[i+3] + c3 * t1y + c4 * t2y;
+
+	            //store points in array
+	            res.push(x);
+	            res.push(y);
+
+	        }
+	    }
+
+	    return res;
+	}
+
+	//////////////
+	// Converts //
+	//////////////
+
 	static degToRad(deg){
 		return deg * Math.PI / 180;
 	}
@@ -46,7 +110,10 @@ class tsbox{
 		return rad * 180 / Math.PI;
 	}
 
-	// Colors
+	////////////
+	// Colors //
+	////////////
+	
 	static randomColor(){
 		let glyph = '0123456789ABCDEF'.split('');
 	    let color = '#';
