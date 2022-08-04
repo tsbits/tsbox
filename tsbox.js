@@ -1,4 +1,48 @@
 class tsbox{	
+	/////////////
+	// Commons //
+	/////////////
+	
+	static ajax(params){		
+		let xhr = new XMLHttpRequest();
+	    	xhr.open(params.method, params.url);
+	   	xhr.setRequestHeader('Content-Type', 'application/json');
+	 	xhr.onload = function(){
+			let response;
+
+			if(xhr.status === 200 ){
+				response = JSON.parse(xhr.responseText);
+
+		    		if(params.success){
+		    			params.success(response);
+		    		}
+			}
+	        	else if(xhr.status !== 200){
+				response = {'status': 'error', 'code': xhr.status};
+
+		    		if(params.error){
+		    			params.error(response);
+		    		}
+	        	}
+	    	};
+
+		xhr.send(JSON.stringify(params.data));
+	}
+	
+	/*
+		// Usage
+		ajax({
+			method: "POST",
+			url: "https://url.ext/path/to/endpoint/to/reach",
+			data: {
+				username: "username",
+				password: "s3cureP4sSW0rD!!!"
+			},
+			success: function(r){
+				console.log(r);
+			}
+		});
+	*/
 	
 	///////////
 	// Maths //
